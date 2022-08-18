@@ -1,72 +1,44 @@
-// import throttle from 'lodash.throttle';
-
-// const formRef = document.querySelector('.feedback-form');
-
-// const emailRef = document.querySelector('input[name="email"]');
-
-// const messageRef = document.querySelector('textarea[name="message"]');
-
-// const dataBase = {
-//     email: '',
-//     message: '',
-// }
-
-
-// function validateForm(e){
-//     const { name, value } = e.target;
-//     dataBase[name] = value;
-//     localStorage.setItem('feedback-form-state', JSON.stringify(dataBase));
-// }
-
-
-// function submitForm (e){
-//     e.preventDefault();
-//     e.currentTarget.reset();
-//     console.log(dataBase);
-// }
-
-
-// function getDataBase(){
-// const getData = localStorage.getItem('feedback-form-state');
-// const parsedData = JSON.parse(getData);
-// if (parsedData) {
-//     emailRef.value = parsedData.email;
-//     messageRef.value = parsedData.message;
-// }}
-
-// formRef.addEventListener('submit', submitForm);
-
-// formRef.addEventListener('input', throttle(validateForm, 500));
-
-// getDataBase();
-
-
 import throttle from 'lodash.throttle';
+const LOCAL_STORAGE_KEY = 'feedback-form-state';
+const formRef = document.querySelector('.feedback-form')
 
-const form = document.querySelector('.feedback-form');
-form.addEventListener('input', throttle(onFormData, 500));
-form.addEventListener('submit', onSubmitForm);
+// прослушиваем форму и submit
+formRef.addEventListener('submit', onFormSubmit);
+formRef.addEventListener('input', throttle(onInputForm, 500));
 
-const formData = {};
-
-function onFormData(e) {
-  formData[e.target.name] = e.target.value;
-  localStorage.setItem('feedback-form-state', JSON.stringify(formData));
+// кладем данные в хранилище
+function onInputForm() {
+  const formData = new FormData(formRef);
+  let userForm = {};
+  formData.forEach((value, name) => (userForm[name] = value.trim()));
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userForm));
 }
 
-function onSubmitForm(e) {
-  console.log(JSON.parse(localStorage.getItem('feedback-form-state')));
-  e.preventDefault();
-  e.currentTarget.reset();
-  localStorage.removeItem('feedback-form-state');
-}
-
-(function dataFromLocalStorage() {
-  const data = JSON.parse(localStorage.getItem('feedback-form-state'));
-  const email = document.querySelector('.feedback-form input');
-  const message = document.querySelector('.feedback-form textarea');
-  if (data) {
-    email.value = data.email;
-    message.value = data.message;
+// берем данные из хранилища
+initForm()
+function initForm() {
+  let persistedForm = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (persistedForm) {
+    persistedForm = JSON.parse(persistedForm);
+    Object.entries(persistedForm).forEach(([name, value]) => {
+      formRef.elements[name].value = value;
+    });
   }
-})();
+}
+
+// Очистка формы и получение данных в консоли
+function onFormSubmit(evt) {
+    evt.preventDefault();
+    const inputName = formRef.email.value;
+    const inputMessage = formRef.message.value;
+    if (inputName && inputMessage !== '') {
+        let userForm = localStorage.getItem(LOCAL_STORAGE_KEY);
+        userForm = JSON.parse(userForm);
+        console.log('Отправляем форму с такими данными', userForm);
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+        evt.currentTarget.reset();
+        return;
+    }
+     alert('Поле электронного адреса и сообщения должны быть заполнены!');
+  return;
+}
