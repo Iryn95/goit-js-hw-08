@@ -1,4 +1,4 @@
-import { throttle } from 'lodash';
+import throttle from 'lodash.throttle';
 
 const form = document.forms.feedbackForm;
 const email = form.email;
