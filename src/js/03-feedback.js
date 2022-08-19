@@ -2,11 +2,11 @@ import throttle from 'lodash.throttle';
 const LOCAL_STORAGE_KEY = 'feedback-form-state';
 const formRef = document.querySelector('.feedback-form')
 
-// прослушиваем форму и submit
+// прослуховуємо форму та submit
 formRef.addEventListener('submit', onFormSubmit);
 formRef.addEventListener('input', throttle(onInputForm, 500));
 
-// кладем данные в хранилище
+// додаємо у сховище
 function onInputForm() {
   const formData = new FormData(formRef);
   let userForm = {};
@@ -14,7 +14,7 @@ function onInputForm() {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userForm));
 }
 
-// берем данные из хранилища
+// беремо зі сховища
 initForm()
 function initForm() {
   let persistedForm = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -26,7 +26,7 @@ function initForm() {
   }
 }
 
-// Очистка формы и получение данных в консоли
+// отримання данних в консолі
 function onFormSubmit(evt) {
     evt.preventDefault();
     const inputName = formRef.email.value;
@@ -34,11 +34,11 @@ function onFormSubmit(evt) {
     if (inputName && inputMessage !== '') {
         let userForm = localStorage.getItem(LOCAL_STORAGE_KEY);
         userForm = JSON.parse(userForm);
-        console.log('Отправляем форму с такими данными', userForm);
+        console.log('Відправляємо форму з такими даними', userForm);
         localStorage.removeItem(LOCAL_STORAGE_KEY);
         evt.currentTarget.reset();
         return;
     }
-     alert('Поле электронного адреса и сообщения должны быть заполнены!');
+     alert('Всі поля повинні бути заповнені');
   return;
 }
